@@ -4,9 +4,7 @@ import "express-async-errors";
 const app = express();
 
 function getPlanets() {
-  const planets = [{ name: "Mercury" }, { name: "Venus" }, { name: "Earth" }];
-
-  //planets.push({ name: "Mars" });
+  const planets = [{ name: "Mercury" }, { name: "Venus" }];
 
   return planets;
 }
