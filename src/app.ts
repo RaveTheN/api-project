@@ -1,16 +1,11 @@
 import express from "express";
 import "express-async-errors";
+import prisma from "./lib/prisma/client";
 
 const app = express();
 
-function getPlanets() {
-  const planets = [{ name: "Mercury" }, { name: "Venus" }];
-
-  return planets;
-}
-
-app.get("/planets", (request, response) => {
-  const planets = getPlanets();
+app.get("/planets", async (request, response) => {
+  const planets = await prisma.planet.findMany();
 
   response.json(planets);
 });
