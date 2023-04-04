@@ -2,9 +2,16 @@ import express from "express";
 import "express-async-errors";
 import prisma from "./lib/prisma/client";
 
+import {
+  validate,
+  planetSchema,
+  PlanetData,
+  validationErrorMiddleware,
+} from "./lib/validation";
+
 const app = express();
 
-app.use(express.json());
+app.use(express.json()); //questo è necessario quando il server riceve una richiesta application/json, così capisce di parsare la stringa di json e farlo diventare un oggetto
 
 app.get("/planets", async (request, response) => {
   const planets = await prisma.planet.findMany();
@@ -12,10 +19,16 @@ app.get("/planets", async (request, response) => {
   response.json(planets);
 });
 
-app.post("/planets", async (request, response) => {
-  const planet = request.body;
+app.post(
+  "/planets",
+  validate({ body: planetSchema }),
+  async (request, response) => {
+    const planet: PlanetData = request.body;
 
-  response.status(201).json(planet);
-});
+    response.status(201).json(planet);
+  }
+);
+
+app.use(validationErrorMiddleware);
 
 export default app;

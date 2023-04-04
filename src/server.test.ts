@@ -6,53 +6,78 @@ import app from "./app";
 
 const request = supertest(app);
 
-test("GET /planets", async () => {
-  const planets = [
-    {
-      id: 1,
-      name: "Mercury",
-      description: null,
-      diameter: 1234,
-      moons: 12,
-      createdAt: "2023-03-20T16:34:17.663Z",
-      updatedAt: "2023-03-20T16:33:56.512Z",
-    },
-    {
-      id: 2,
-      name: "Venus",
-      description: null,
-      diameter: 21354,
-      moons: 2,
-      createdAt: "2023-03-20T16:35:06.970Z",
-      updatedAt: "2023-03-20T16:34:59.198Z",
-    },
-  ];
+describe("GET /planets", () => {
+  test("Valid request", async () => {
+    const planets = [
+      {
+        id: 1,
+        name: "Mercury",
+        description: null,
+        diameter: 1234,
+        moons: 12,
+        createdAt: "2023-03-20T16:34:17.663Z",
+        updatedAt: "2023-03-20T16:33:56.512Z",
+      },
+      {
+        id: 2,
+        name: "Venus",
+        description: null,
+        diameter: 21354,
+        moons: 2,
+        createdAt: "2023-03-20T16:35:06.970Z",
+        updatedAt: "2023-03-20T16:34:59.198Z",
+      },
+    ];
 
-  //@ts-ignore
-  prismaMock.planet.findMany.mockResolvedValue(planets);
+    //@ts-ignore
+    prismaMock.planet.findMany.mockResolvedValue(planets);
 
-  const response = await request
-    .get("/planets")
-    .expect(200)
-    .expect("Content-type", /application\/json/);
+    const response = await request
+      .get("/planets")
+      .expect(200)
+      .expect("Content-type", /application\/json/);
 
-  expect(response.body).toEqual(planets);
+    expect(response.body).toEqual(planets);
+  });
 });
 
-test("POST /planets", async () => {
-  const planet = [
-    {
-      name: "Mercury",
-      diameter: 1234,
-      moons: 12,
-    },
-  ];
+describe("POST /planets", () => {
+  test("Valid request", async () => {
+    const planet = [
+      {
+        name: "Mercury",
+        diameter: 1234,
+        moons: 12,
+      },
+    ];
 
-  const response = await request
-    .post("/planets")
-    .send(planet)
-    .expect(201)
-    .expect("Content-type", /application\/json/);
+    const response = await request
+      .post("/planets")
+      .send(planet)
+      .expect(201)
+      .expect("Content-type", /application\/json/);
 
-  expect(response.body).toEqual(planet);
+    expect(response.body).toEqual(planet);
+  });
+
+  test("Invalid request", async () => {
+    const planet = [
+      {
+        diameter: 1234,
+        moons: 12,
+      },
+    ];
+
+    const response = await request
+      .post("/planets")
+      .send(planet)
+      .expect(422)
+      .expect("Content-type", /application\/json/);
+
+    expect(response.body).toEqual({
+      errors: {
+        body: expect.any(Array),
+      },
+    });
+  });
 });
